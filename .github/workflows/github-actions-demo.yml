@@ -23,8 +23,8 @@ jobs:
       ### 依赖安装和打包阶段，Actions 中的打包机没有全局安装 yarn，故这里使用 npm
       - name: Install and Build
         run: |
-          npm install
-          npm run build
+          yarn install
+          yarn build
  
       ### Deploy 阶段，使用该 actions 将静态文件推送至 gh-pages 分支
       - name: Deploy
