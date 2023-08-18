@@ -1,18 +1,34 @@
-name: GitHub Actions Demo
-run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
-on: [push]
+
+### CI 脚本名
+name: Build and Deploy
+ 
+### 触发 CI 脚本的前提，标注只在 master 分支 Push 时触发 CI 脚本
+on:
+  push:
+    branches: [ master ]
+ 
+  ### 允许在 actions 中跑 workflow 的流程
+  workflow_dispatch:
+ 
+### CI 执行的 Jobs
 jobs:
-  Explore-GitHub-Actions:
+  build-and-deploy:
+    ### 执行环境
     runs-on: ubuntu-latest
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      - name: Check out repository code
-        uses: actions/checkout@v3
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
+      ### 检出 ${GITHUB_WORKSPACE}
+      - name: Checkout
+        uses: actions/checkout@v2.3.1
+ 
+      ### 依赖安装和打包阶段，Actions 中的打包机没有全局安装 yarn，故这里使用 npm
+      - name: Install and Build
         run: |
-          ls ${{ github.workspace }}
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+          npm install
+          npm run build
+ 
+      ### Deploy 阶段，使用该 actions 将静态文件推送至 gh-pages 分支
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@4.1.6
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: out
